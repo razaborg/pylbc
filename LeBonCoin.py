@@ -12,7 +12,7 @@ def LoadResultObj(result):
     return namedtuple("Result", result.keys())(*result.values())
 
 class Search():
-    def __init__(self, verbose=False):
+    def __init__(self):
         self.api_url = 'https://api.leboncoin.fr/api/adfinder/v1/search'
         self.timestamp = datetime.date.fromtimestamp(time.time()).strftime('%Y%m%d%H%M%S')
         self.session = requests.Session()
@@ -49,6 +49,9 @@ class Search():
         self.__keywords = {"type":"all"}
 
     def __prepare_payload(self):
+        '''
+        Prepare the final payload with the current value of the different variables.
+        '''
         self.payload = {
             'pivot' : self.__pivot,
             'limit' : self.__limit,
@@ -93,24 +96,36 @@ class Search():
         self.__location_filters['disable_region'] = False
 
     def set_rooms(self, mini=None, maxi=None):
-        self.__range_filters['rooms'] = self.set_range(mini, maxi)
+        self.__range_filters['rooms'] = self.__set_range(mini, maxi)
 
     def set_square(self, mini=None, maxi=None):
-        self.__range_filters['square'] = self.set_range(mini,maxi)
+        self.__range_filters['square'] = self.__set_range(mini,maxi)
 
     def set_price(self, mini=None, maxi=None):
-        self.__range_filters['price'] = self.set_range(mini, maxi)
+        self.__range_filters['price'] = self.__set_range(mini, maxi)
 
     def __disable_results(self):
+        '''
+        Disable the results in teh response. Will  only return metadata.
+        '''
         self.__limit_alu = 0
         self.__limit = 0
+        self.__prepare_payload()
 
     def __enable_results(self):
+        '''
+        Enable the results in teh response.
+        '''
         self.__limit_alu = 1
         self.__limit = 100
+        self.__prepare_payload()
 
     @staticmethod
-    def set_range(mini=None, maxi=None):
+    def __set_range(mini=None, maxi=None):
+        '''
+        Static method to process filters of type "range".
+        '''
+
         if maxi and mini:
             assert(maxi > mini)
         if mini:
@@ -126,23 +141,35 @@ class Search():
         return therange
 
     def show_filters(self):
+        '''
+        Display the current value of the differents filters which have been set
+        '''
         self.__prepare_payload()
         pp = pprint.PrettyPrinter(indent=4, compact=False)
         pprint.pprint(self.payload)
     
     def request_once(self, verify=True):
+        '''
+        Requests only one result page and returns the result of the API.
+        '''
         self.__prepare_payload()
         req = self.session.post(self.api_url, data=json.dumps(self.payload), headers=self.headers, verify=verify)
         return json.loads(req.text)
 
     def request_infos(self, verify=True):
+        '''
+        Requests only the metadata of the query and returns the result.
+        '''
         self.__disable_results()
-        self.__prepare_payload()
         req = self.session.post(self.api_url, data=json.dumps(self.payload), headers=self.headers, verify=verify)
         self.__enable_results()
         return json.loads(req.text)
 
     def iter_results(self, verify=True):
+        '''
+        Iterates over the pages to get all the results from the API.
+        '''
+
         while True:
             response = self.request_once(verify)
             if not 'ads' in response.keys():
