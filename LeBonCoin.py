@@ -7,11 +7,16 @@ import pprint
 import json
 from raw_values import *
 from collections import namedtuple
+import time
+import datetime
 
-def LoadResultObj(result):
-    return namedtuple("Result", result.keys())(*result.values())
+
 
 class Search():
+    '''
+    This object handles the interface with the lbc search API.
+    It provides useful methods to make requests using Python and process results.
+    '''
     def __init__(self):
         self.api_url = 'https://api.leboncoin.fr/api/adfinder/v1/search'
         self.timestamp = datetime.date.fromtimestamp(time.time()).strftime('%Y%m%d%H%M%S')
@@ -184,9 +189,90 @@ class Search():
         assert(len(results) > 1)
         out = []
         for result in results:
-            for i in result['attributes'] :
-                result[i['key']] = {'value': i['value'], 'value_label': i ['value_label']}
-            del result['attributes']
-            out.append(namedtuple("Result", result.keys())(*result.values()))
+            #for i in result['attributes'] :
+            #    result[i['key']] = {'value': i['value'], 'value_label': i ['value_label']}
+            #del result['attributes']
+            #out.append(namedtuple("Result", result.keys())(*result.values()))
+            out.append(SimplifiedResult(result))
         return out
+
+
+class SimplifiedResult():
+    '''
+    This object handles Results from the lbc API.
+    This is a lighter version of the returned object, with only the needed elements \
+    and some useful methods.
+    '''
+    def __init__(self, result):
+        assert(type(result) is type(dict()))
+        # check that all the required keys are present in the dict
         
+        REQUIRED_KEYS = ('first_publication_date', 'subject', 'url', 'price', 'images', \
+                'attributes', 'location', 'category_id')
+        assert(all([key in result.keys() for key in REQUIRED_KEYS]))
+
+        ts = time.mktime(time.strptime(result['first_publication_date'], '%Y-%m-%d %H:%M:%S'))
+        self.publication_date = datetime.date.fromtimestamp(ts)
+        now = datetime.date.fromtimestamp(time.time())
+        delta = now - self.publication_date
+        if delta.days < 5:
+            self.is_recent = True
+        else:
+            self.is_recent = False
+        
+        self.title = result['subject']
+        self.url = result['url']
+        
+        if len(result['price']) == 1:
+            self.price = result['price'][0]
+        else:
+            self.price = str(result['price'])
+        
+        if 'thumb_url' in result['images']:
+            self.thumbnail = result['images']['thumb_url']
+        else:
+            self.thumbnail = ''
+
+        assert('lat' in result['location'].keys() and \
+                'lng' in result['location'].keys())
+        
+        self.coordinates = (result['location']['lat'], result['location']['lng'])
+        
+        self.real_estate_type = None
+        self.square = None
+        for i in result['attributes'] :
+            key = i['key']
+            if key == 'real_estate_type':
+                self.real_estate_type = i['value_label'].lower()
+            if key == 'square':
+                self.square = i['value'].lower()
+        
+        if self.real_estate_type == 'maison':
+            self.is_house = True
+        else:
+            self.is_house = False
+
+        if self.real_estate_type == 'appartement':
+            self.is_appartment = True
+        else:
+            self.is_appartment = False
+    
+
+
+    def __repr__(self):
+        s = 'Result(title="{}", is_recent={}, publication_date="{}", price={}, coordinates={}, real_estate_type="{}", square={}, is_house={}, is_appartment={}, url="{}", thumbnail="{}")'.format( \
+                self.title,
+                self.is_recent,
+                self.publication_date,
+                self.price,
+                self.location,
+                self.real_estate_type,
+                self.square,
+                self.is_house,
+                self.is_appartment,
+                self.url,
+                self.thumbnail)
+        return s
+
+
+
