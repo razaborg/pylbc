@@ -99,7 +99,20 @@ class Search():
             self.__location_filters['departments'].append(number)
             self.__location_filters['locations'].append(dep)
         self.__location_filters['disable_region'] = False
+    
+    
+    def set_coordinates(self, lat, lng, radius):
+        assert(int(radius) < 100)
+        self.__location_filters['locations'] = []
+        self.__location_filters['departments'] = []
 
+        self.__location_filters["area"] = { 
+            "lat":float(lat), 
+            "lng":float(lng), 
+            "radius":int(radius)*1000
+            }
+        self.__location_filters['disable_region'] = False
+        
     def set_rooms(self, mini=None, maxi=None):
         self.__range_filters['rooms'] = self.__set_range(mini, maxi)
 
