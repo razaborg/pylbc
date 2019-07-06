@@ -52,6 +52,7 @@ class Search():
         self.__pivot = "0,0,0" # Used for pagination. The pivot is the Item identifier from which to start the response
         # the pivot is given by the server when number of results exceed the limit of results.
         self.__keywords = {"type":"all"}
+        self.coordinates = None
 
     def __prepare_payload(self):
         '''
@@ -74,11 +75,17 @@ class Search():
             }
 
     def set_category(self, name):
+        '''
+        Define one category to look into.
+        '''
         if name not in CATEGORIES.keys():
            raise InvalidCategory
         self.__category['id'] = CATEGORIES[name]
 
     def set_real_estate_types(self, list_of_types):
+        '''
+        Define the list real estate types we are looking for.
+        '''
         self.__enum_filters['real_estate_type'] = []
         for name in list_of_types:
             if name not in REAL_ESTATE_TYPES.keys():
@@ -86,6 +93,10 @@ class Search():
             self.__enum_filters['real_estate_type'].append(REAL_ESTATE_TYPES[name])
 
     def set_departments(self, list_of_departments):
+        '''
+        Define a list of departments to search into.
+        Incompatible with coordinates search.
+        '''
         self.__location_filters['locations'] = []
         self.__location_filters['departments'] = []
         for number in list_of_departments:
@@ -99,9 +110,16 @@ class Search():
             self.__location_filters['departments'].append(number)
             self.__location_filters['locations'].append(dep)
         self.__location_filters['disable_region'] = False
+
+        self.has_departments = True
+        self.has_coordinates = False
     
     
     def set_coordinates(self, lat, lng, radius):
+        '''
+        Define base coordinates and a radius to search around.
+        Incompatible with departments search.
+        '''
         assert(int(radius) < 100)
         self.__location_filters['locations'] = []
         self.__location_filters['departments'] = []
@@ -112,6 +130,10 @@ class Search():
             "radius":int(radius)*1000
             }
         self.__location_filters['disable_region'] = False
+
+        self.has_departments = False
+        self.coordinates = self.__location_filters["area"]
+        self.has_coordinates = True
         
     def set_rooms(self, mini=None, maxi=None):
         self.__range_filters['rooms'] = self.__set_range(mini, maxi)
