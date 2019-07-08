@@ -232,7 +232,6 @@ class SimplifiedResult():
     def __init__(self, result):
         assert(type(result) is type(dict()))
         # check that all the required keys are present in the dict
-        
         REQUIRED_KEYS = ('first_publication_date', 'subject', 'url', 'price', 'images', \
                 'attributes', 'location', 'category_id')
         assert(all([key in result.keys() for key in REQUIRED_KEYS]))
@@ -269,18 +268,28 @@ class SimplifiedResult():
                 self.square = i['value'].lower()
 
     def is_house(self): 
+        '''
+        Check if the ad is about a house or not 
+        '''
         if self.real_estate_type == 'maison':
             return True
         else:
             return False
 
     def is_appartment(self):
+        '''
+        Check if the ad is about an appartement or not 
+        '''
         if self.real_estate_type == 'appartement':
             return True
         else:
             return False
         
     def is_recent(self, days=5):
+        '''
+        Check if the ad can be considered as "recent".
+        The default recent ads are the ones < 5 days.
+        '''
         now = datetime.date.fromtimestamp(time.time())
         delta = now - self.publication_date
         if delta.days <= int(days):
@@ -293,16 +302,17 @@ class SimplifiedResult():
     def __repr__(self):
         s = 'Result(title="{}", is_recent={}, publication_date="{}", price={}, coordinates={}, real_estate_type="{}", square={}, is_house={}, is_appartment={}, url="{}", thumbnail="{}")'.format( \
                 self.title,
-                self.is_recent,
+                self.is_recent(),
                 self.publication_date,
                 self.price,
                 self.location,
                 self.real_estate_type,
                 self.square,
-                self.is_house,
-                self.is_appartment,
+                self.is_house(),
+                self.is_appartment(),
                 self.url,
-                self.thumbnail)
+                self.thumbnail
+                )
         return s
 
 
