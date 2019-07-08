@@ -209,27 +209,18 @@ class Search():
         '''
         Iterates over the pages to get all the results from the API.
         '''
-
+        
         while True:
             response = self.request_once(verify)
             if not 'ads' in response.keys():
-                break
+                break # we exit the loop only when there is no results pages left
+            
             if 'pivot' in response.keys():
                 self.__pivot = response['pivot']
-            data = self.__listOfResults2Obj(response['ads'])
-            yield data
-    
-    @staticmethod
-    def __listOfResults2Obj(results):
-        assert(len(results) > 1)
-        out = []
-        for result in results:
-            #for i in result['attributes'] :
-            #    result[i['key']] = {'value': i['value'], 'value_label': i ['value_label']}
-            #del result['attributes']
-            #out.append(namedtuple("Result", result.keys())(*result.values()))
-            out.append(SimplifiedResult(result))
-        return out
+                # pivot is the last ads id of the page. it is necessary to handle pagination
+            
+            for result in response['ads']:
+                yield SimplifiedResult(result)
 
 
 class SimplifiedResult():
@@ -248,12 +239,7 @@ class SimplifiedResult():
 
         ts = time.mktime(time.strptime(result['first_publication_date'], '%Y-%m-%d %H:%M:%S'))
         self.publication_date = datetime.date.fromtimestamp(ts)
-        now = datetime.date.fromtimestamp(time.time())
-        delta = now - self.publication_date
-        if delta.days < 5:
-            self.is_recent = True
-        else:
-            self.is_recent = False
+        
         
         self.title = result['subject']
         self.url = result['url']
@@ -281,16 +267,26 @@ class SimplifiedResult():
                 self.real_estate_type = i['value_label'].lower()
             if key == 'square':
                 self.square = i['value'].lower()
-        
-        if self.real_estate_type == 'maison':
-            self.is_house = True
-        else:
-            self.is_house = False
 
-        if self.real_estate_type == 'appartement':
-            self.is_appartment = True
+    def is_house(self): 
+        if self.real_estate_type == 'maison':
+            return True
         else:
-            self.is_appartment = False
+            return False
+
+    def is_appartment(self):
+        if self.real_estate_type == 'appartement':
+            return True
+        else:
+            return False
+        
+    def is_recent(self, days=5):
+        now = datetime.date.fromtimestamp(time.time())
+        delta = now - self.publication_date
+        if delta.days <= int(days):
+            return True
+        else:
+            return False
     
 
 
