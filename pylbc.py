@@ -305,7 +305,7 @@ class SimplifiedResult():
                 self.is_recent(),
                 self.publication_date,
                 self.price,
-                self.location,
+                self.coordinates,
                 self.real_estate_type,
                 self.square,
                 self.is_house(),
