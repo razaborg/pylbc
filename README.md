@@ -102,10 +102,8 @@ print(infos)
 print("A total of %d results is announced by the server." % infos['total'])
 
 # récupération et affichage de tous les résultats
-results = []
 for result in query.iter_results():
     print(result)
-print("%d results have been successfully downloaded." % len(results))
 ```
 
 
