@@ -52,6 +52,8 @@ class Search():
         self.__pivot = "0,0,0" # Used for pagination. The pivot is the Item identifier from which to start the response
         # the pivot is given by the server when number of results exceed the limit of results.
         self.__keywords = {"type":"all"}
+        self.__sort_by = 'time'
+        self.__sort_order = 'desc'
         self.coordinates = None
 
     def __prepare_payload(self):
@@ -70,9 +72,18 @@ class Search():
                 'keywords' : self.__keywords,
                 'owner' : self.__owner
                 },
-            "sort_by":"time",
-            "sort_order":"desc"
+            "sort_by":self.__sort_by,
+            "sort_order":self.__sort_order
             }
+
+    def set_sorting(self, by, order='desc'):
+        CRITERIAS = ('time', 'price')
+        ORDERS = ('asc', 'desc')
+        assert(by in CRITERIAS)
+        assert(order in ORDERS)
+
+        self.__sort_order=order
+        self.__sort_by=by
 
     def set_category(self, name):
         '''
@@ -144,6 +155,17 @@ class Search():
     def set_price(self, mini=None, maxi=None):
         self.__range_filters['price'] = self.__set_range(mini, maxi)
 
+    def set_max_m2price(self, max_price, max_m2price):
+        '''
+        This method determines automatically price and square ranges from a price-per-square range.
+        '''
+        max_price = int(max_price)
+        max_square = int(max_price/max_m2price)
+        
+        self.set_price(maxi=max_price)
+        self.set_square(mini=max_square)
+
+
     def __disable_results(self):
         '''
         Disable the results in teh response. Will  only return metadata.
@@ -176,6 +198,9 @@ class Search():
         therange = {}
         if mini:
             therange['min'] = mini
+        else:
+            therange['min'] = 0
+
         if maxi:
             therange['max'] = maxi
         return therange
