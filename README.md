@@ -10,7 +10,21 @@ pip3 install requests
 
 ## Usage 
 
-See **main.py** and examples below :-)
+See **example.py** and examples below :-)
+
+
+### Through the CLI tool
+
+Just do `python3 lbcli.py` ! 
+
+### As a library
+
+To import it in another script, you can just do as follow :
+```python
+from pylbc.pylbc import Search, SimplifiedResult
+
+# and code ... :-)
+```
 
 ## Documentation
 
