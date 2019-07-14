@@ -155,16 +155,6 @@ class Search():
     def set_price(self, mini=None, maxi=None):
         self.__range_filters['price'] = self.__set_range(mini, maxi)
 
-    def set_max_m2price(self, max_price, max_m2price):
-        '''
-        This method determines automatically price and square ranges from a price-per-square range.
-        '''
-        max_price = int(max_price)
-        max_square = int(max_price/max_m2price)
-        
-        self.set_price(maxi=max_price)
-        self.set_square(mini=max_square)
-
 
     def __disable_results(self):
         '''
