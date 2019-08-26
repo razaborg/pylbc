@@ -5,12 +5,30 @@ import requests
 import datetime
 import pprint
 import json
-from raw_values import *
 from collections import namedtuple
 import time
 import datetime
 
+CATEGORIES = { 8: 'immobilier', 9: 'ventes', 10:'locations', 11: 'colocations'}
+get_cat_by_id = lambda x : next((name for id,name in CATEGORIES.items() if str(id) == str(x)), False)
+get_cat_by_name = lambda x : next((str(id) for id,name in CATEGORIES.items() if name == x), False)
+check_cat_name = lambda x : True if x in CATEGORIES.values() else False
+check_cat_id = lambda x : True if x in CATEGORIES.keys() else False
 
+REAL_ESTATE_TYPES = {
+        1: 'maison',
+        2: 'appartement',
+        3: 'terrain',
+        4: 'parking',
+        5: 'autre'
+        }
+get_type_by_id = lambda x : next((name for id,name in REAL_ESTATE_TYPES.items() if id == x), False)
+get_type_by_name = lambda x : next((str(id) for id,name in REAL_ESTATE_TYPES.items() if name == x), False)
+check_type_name = lambda x : True if x in REAL_ESTATE_TYPES.values() else False
+check_type_id = lambda x : True if x in REAL_ESTATE_TYPES.keys() else False
+
+
+DEPARTMENTS = ('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '2A', '2B', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60', '61', '62', '63', '64', '65', '66', '67', '68', '69', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79', '80', '81', '82', '83', '84', '85', '86', '87', '88', '89', '90', '91', '92', '93', '94', '95', '971', '972', '973', '974', '976')
 
 class Search():
     '''
@@ -28,7 +46,7 @@ class Search():
             'Accept-Encoding': 'gzip, deflate'
         }
         
-        self.__category = {'id': CATEGORIES['immobilier']} # by default all "IMMOBILIER" ads
+        self.__category = {'id': get_cat_by_name('immobilier')} # by default all "IMMOBILIER" ads
         self.__range_filters = {
                 "rooms": {},
                 "square": {},
@@ -36,7 +54,7 @@ class Search():
                 }
         self.__enum_filters = {
                 'real_estate_type': [],
-                'ad_type': [AD_TYPES['offres']] # default to "offers"
+                'ad_type': ['offer'] # default to "offers"
                 }
         self.__location_filters = {
                 "area":{"lat":0.0,"lng":0.0,"radius":0},
@@ -89,9 +107,9 @@ class Search():
         '''
         Define one category to look into.
         '''
-        if name not in CATEGORIES.keys():
+        if not check_cat_name(name) :
            raise InvalidCategory
-        self.__category['id'] = CATEGORIES[name]
+        self.__category['id'] = get_cat_by_name(name)
 
     def set_real_estate_types(self, list_of_types):
         '''
@@ -99,9 +117,9 @@ class Search():
         '''
         self.__enum_filters['real_estate_type'] = []
         for name in list_of_types:
-            if name not in REAL_ESTATE_TYPES.keys():
+            if not check_type_name(name):
                 raise InvalidEstateType
-            self.__enum_filters['real_estate_type'].append(REAL_ESTATE_TYPES[name])
+            self.__enum_filters['real_estate_type'].append(get_type_by_name(name))
 
     def set_departments(self, list_of_departments):
         '''
@@ -209,8 +227,9 @@ class Search():
         '''
         self.__prepare_payload()
         req = self.session.post(self.api_url, data=json.dumps(self.payload), headers=self.headers, verify=verify)
+        if not req.status_code == requests.codes.ok:
+            req.raise_for_status()
         return json.loads(req.text)
-
     def request_infos(self, verify=True):
         '''
         Requests only the metadata of the query and returns the result.
@@ -218,6 +237,8 @@ class Search():
         self.__disable_results()
         req = self.session.post(self.api_url, data=json.dumps(self.payload), headers=self.headers, verify=verify)
         self.__enable_results()
+        if not req.status_code == requests.codes.ok:
+            req.raise_for_status()
         return json.loads(req.text)
 
     def iter_results(self, verify=True):
@@ -235,16 +256,28 @@ class Search():
                 # pivot is the last ads id of the page. it is necessary to handle pagination
             
             for result in response['ads']:
-                yield SimplifiedResult(result)
+                yield SearchResult.from_dict(result)
 
 
-class SimplifiedResult():
+class SearchResult():
     '''
     This object handles Results from the lbc API.
     This is a lighter version of the returned object, with only the needed elements \
     and some useful methods.
     '''
-    def __init__(self, result):
+    def __init__(self, title, category, publication_date, price, coordinates, real_estate_type, square, url, thumbnail):
+        self.title = title
+        self.publication_date = publication_date
+        self.category = category
+        self.price = price
+        self.coordinates = coordinates
+        self.real_estate_type = real_estate_type
+        self.square = square 
+        self.url = url
+        self.thumbnail = thumbnail
+
+    @classmethod
+    def from_dict(cls, result):
         assert(type(result) is type(dict()))
         # check that all the required keys are present in the dict
         REQUIRED_KEYS = ('first_publication_date', 'subject', 'url', 'price', 'images', \
@@ -252,35 +285,37 @@ class SimplifiedResult():
         assert(all([key in result.keys() for key in REQUIRED_KEYS]))
 
         ts = time.mktime(time.strptime(result['first_publication_date'], '%Y-%m-%d %H:%M:%S'))
-        self.publication_date = datetime.date.fromtimestamp(ts)
+        publication_date = datetime.date.fromtimestamp(ts) 
         
-        
-        self.title = result['subject']
-        self.url = result['url']
+        title = result['subject']
+        url = result['url']
+        category = get_cat_by_id(result['category_id'])
         
         if len(result['price']) == 1:
-            self.price = result['price'][0]
+            price = result['price'][0]
         else:
-            self.price = str(result['price'])
+            price = str(result['price'])
         
         if 'thumb_url' in result['images']:
-            self.thumbnail = result['images']['thumb_url']
+            thumbnail = result['images']['thumb_url']
         else:
-            self.thumbnail = ''
+            thumbnail = ''
 
         assert('lat' in result['location'].keys() and \
                 'lng' in result['location'].keys())
         
-        self.coordinates = (result['location']['lat'], result['location']['lng'])
+        coordinates = (result['location']['lat'], result['location']['lng'])
         
-        self.real_estate_type = None
-        self.square = None
+        real_estate_type = None
+        square = None
         for i in result['attributes'] :
             key = i['key']
             if key == 'real_estate_type':
-                self.real_estate_type = i['value_label'].lower()
+                real_estate_type = i['value_label'].lower()
             if key == 'square':
-                self.square = i['value'].lower()
+                square = i['value'].lower()
+        
+        return cls(title, category, publication_date, price, coordinates, real_estate_type, square, url, thumbnail)
 
     def is_house(self): 
         '''
@@ -313,18 +348,15 @@ class SimplifiedResult():
             return False
     
 
-
     def __repr__(self):
-        s = 'Result(title="{}", is_recent={}, publication_date="{}", price={}, coordinates={}, real_estate_type="{}", square={}, is_house={}, is_appartment={}, url="{}", thumbnail="{}")'.format( \
+        s = 'SearchResult(title="{}", category="{}", publication_date="{}", price={}, coordinates={}, real_estate_type="{}", square={}, url="{}", thumbnail="{}")'.format( \
                 self.title,
-                self.is_recent(),
+                self.category,
                 self.publication_date,
                 self.price,
                 self.coordinates,
                 self.real_estate_type,
                 self.square,
-                self.is_house(),
-                self.is_appartment(),
                 self.url,
                 self.thumbnail
                 )
