@@ -10,19 +10,18 @@ pip3 install requests
 
 ## Usage 
 
-See **example.py** and examples below :-)
-
+Regardez l'exemple plus bas ;-)
 
 ### Through the CLI tool
 
-Just do `python3 lbcli.py` ! 
+Simplement avec `python3 lbcli.py` ! 
 
 ### As a library
 
 ```python
-from pylbc.pylbc import Search, SimplifiedResult
+from pylbc.pylbc import Search, SearchResult
 
-# and code ... :-)
+# and do your magic here... :-)
 ```
 
 ## Documentation
@@ -50,21 +49,21 @@ Une fois la recherche paramétrée, la requete peut être lancée avec :
 - la méthode **request_once()** pour charger une seule page de résultats
 - la méthode **iter_results()** pour charger l'ensemble des résultats à travers un itérateur
 
-#### La classe SimplifiedResults()
+### La classe SearchResult()
 
 Cette classe est un "wrapper" permettant de manipuler plus facilement les résultats renvoyés par l'API.
 Elle dispose ainsi de méthodes et d'attributs spécifiques en ce sens.
 
 Actuellement ce type d'objet ne peut être généré qu'automatiquement à partir de la classe Search(). 
 
-##### Les méthodes "custom" 
+#### Les méthodes "custom" 
 
 - **is_recent()** renvoie un booléen
 - **is_appartment()** renvoie un booléen
 - **is_house()** renvoie un booléen
 - **price_per_square()** renvoie le prix au m2 du résultat
 
-##### Les attributs
+#### Les attributs
 
 Voici à quoi ressemble un objet de cette classe, avec l'ensemble de ses attributs:
 ```python
@@ -81,8 +80,6 @@ SearchResult(\
 ```
 
 ### Examples 
-
-
 
 
 ```python
