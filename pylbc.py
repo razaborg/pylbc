@@ -328,6 +328,7 @@ class SearchResult():
 
     def is_appartment(self):
         '''
+        CUSTOM METHOD
         Check if the ad is about an appartement or not 
         '''
         if self.real_estate_type == 'appartement':
@@ -337,6 +338,7 @@ class SearchResult():
         
     def is_recent(self, days=5):
         '''
+        CUSTOM METHOD
         Check if the ad can be considered as "recent".
         The default recent ads are the ones < 5 days.
         '''
@@ -347,6 +349,12 @@ class SearchResult():
         else:
             return False
     
+    def price_per_square(self):
+        '''
+        CUSTOM METHOD
+        Return the price per m2 of a result.
+        '''
+        return self.price/self.square
 
     def __repr__(self):
         s = 'SearchResult(title="{}", category="{}", publication_date="{}", price={}, coordinates={}, real_estate_type="{}", square={}, url="{}", thumbnail="{}")'.format( \

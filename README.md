@@ -57,11 +57,12 @@ Elle dispose ainsi de méthodes et d'attributs spécifiques en ce sens.
 
 Actuellement ce type d'objet ne peut être généré qu'automatiquement à partir de la classe Search(). 
 
-##### Les méthodes utiles 
+##### Les méthodes "custom" 
 
 - **is_recent()** renvoie un booléen
 - **is_appartment()** renvoie un booléen
 - **is_house()** renvoie un booléen
+- **price_per_square()** renvoie le prix au m2 du résultat
 
 ##### Les attributs
 
