@@ -67,16 +67,13 @@ Actuellement ce type d'objet ne peut être généré qu'automatiquement à parti
 
 Voici à quoi ressemble un objet de cette classe, avec l'ensemble de ses attributs:
 ```python
-Result(\
+SearchResult(\
  title="Charmante maison en pierre centre-ville", \
- is_recent=False, \
  publication_date="2019-06-16", \
  price=510, \
  coordinates=(48.20384, -1.48986), \
  real_estate_type="maison", \
  square=60, \
- is_house=True, \
- is_appartment=False, \
  url="https://www.leboncoin.fr/locations/xxxxxxxxxxx.htm", \
  thumbnail="https://img6.leboncoin.fr/ad-thumb/xxxxxxxxxxxxxxx.jpg"\
 )
