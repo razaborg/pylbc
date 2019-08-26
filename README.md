@@ -1,4 +1,4 @@
-# lbc_api
+# pylbc
 
 Une API Python3 pour LeBonCoin.
 
@@ -19,7 +19,6 @@ Just do `python3 lbcli.py` !
 
 ### As a library
 
-To import it in another script, you can just do as follow :
 ```python
 from pylbc.pylbc import Search, SimplifiedResult
 
