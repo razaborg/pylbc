@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 import argparse
 import pylbc
-from raw_values import * 
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--coordinates", '-c', nargs=2, metavar=('LAT', 'LNG'), type=float, help='Lat/Long of the center point.')
 parser.add_argument('--radius', type=int, help="Radius around the center point.", default=50)
-parser.add_argument('--category', '-C', type=str, choices=CATEGORIES.keys(), required=True)
-parser.add_argument('--real-estate-type', '-T', type=str, choices=REAL_ESTATE_TYPES.keys(), required=True)
+parser.add_argument('--category', '-C', type=str, choices=pylbc.CATEGORIES.values(), required=True)
+parser.add_argument('--real-estate-type', '-T', type=str, choices=pylbc.REAL_ESTATE_TYPES.values(), required=True)
 parser.add_argument('--price-range', '-p', nargs=2, type=int)
 parser.add_argument('--square-range', '-s', nargs=2, type=int)
 parser.add_argument('--rooms-range', '-r', nargs=2, type=int)
