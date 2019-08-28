@@ -88,6 +88,22 @@ class Search():
             "sort_by":self.__sort_by,
             "sort_order":self.__sort_order
             }
+    
+    def set_query(self, query, titleonly=False):
+        '''
+        Define a list of keywords (a query) to filter the results
+        If titleonly is set to true, set the option "rechercher dans le titre uniquement"
+
+        Compatible with leboncoin special operators:
+            "this word" : to output only results containing exactly 'this word'
+            NOT word: to output only results NOT containing 'word'
+            this OR that: to output results containing 'this' or 'that'
+            () : to group and priorise keywords
+        '''
+
+        if titleonly:
+            self.__keywords['type'] = 'subject'
+        self.__keywords['text'] = query
 
     def set_sorting(self, by, order='desc'):
         CRITERIAS = ('time', 'price')
