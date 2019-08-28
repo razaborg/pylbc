@@ -56,7 +56,7 @@ class Search():
                 "city_zipcodes":[],
                 "departments":[],
                 "disable_region":True,
-                "locations":[],
+                "locations": [],
                 "regions":[]
                 }
         self.__owner = {}
@@ -105,6 +105,15 @@ class Search():
         if not check_cat_name(name) :
            raise InvalidCategory
         self.__category['id'] = get_cat_by_name(name)
+    
+    def add_city(self, cityname, zipcode):
+        '''
+        Allow to add a new citiy where we want to search
+        '''
+        # WARNING: not compatible with departments list! Need to clear it first.
+        self.__location_filters['departments'] = []
+        self.__location_filters['locations'].append({"city":cityname,"zipcode":zipcode,"locationType":"city"})
+
 
     def set_real_estate_types(self, list_of_types):
         '''
@@ -121,6 +130,7 @@ class Search():
         Define a list of departments to search into.
         Incompatible with coordinates search.
         '''
+        # WARNING: not compatible with locations list (cities typically)! Need to clear it first.
         self.__location_filters['locations'] = []
         self.__location_filters['departments'] = []
         for number in list_of_departments:
