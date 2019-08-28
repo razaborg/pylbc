@@ -2,6 +2,8 @@
 
 Une API Python3 pour LeBonCoin.
 
+**SEULEMENT pour la catégorie immobilier pour le moment.**
+
 ## Installation
 
 Requis : **python >= 3.0**
