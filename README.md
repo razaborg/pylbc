@@ -2,27 +2,56 @@
 
 Une API Python3 pour LeBonCoin.
 
-## Requirements 
+## Installation
 
-```
-pip3 install requests
-```
+Requis : **python >= 3.0**
 
-## Usage 
-
-Regardez l'exemple plus bas ;-)
-
-### Through the CLI tool
-
-Simplement avec `python3 lbcli.py` ! 
-
-### As a library
+### Avec pip
 
 ```python
-from pylbc.pylbc import Search, SearchResult
-
-# and do your magic here... :-)
+python3 -m venv venv
+source venv/bin/activate
+python3 -m pip install pylbc 
 ```
+
+### Depuis les sources 
+
+```bash
+git clone https://github.com/razaborg/pylbc.git
+cd pylbc
+```
+
+Et utilisez le directement ou installez-le avec setuptools :-)
+
+
+## Utilisation
+
+### Directement en CLI
+
+```
+./lbcli.py
+usage: lbcli.py [-h] [--coordinates LAT LNG] [--radius RADIUS] --category
+                {immobilier,ventes,locations,colocations} --real-estate-type
+                {maison,appartement,terrain,parking,autre}
+                [--price-range PRICE_RANGE PRICE_RANGE]
+                [--square-range SQUARE_RANGE SQUARE_RANGE]
+                [--rooms-range ROOMS_RANGE ROOMS_RANGE]
+                [--order-by {price,time}] [--sort-order {asc,desc}]
+                [--verbose] [-y]
+lbcli.py: error: the following arguments are required: --category/-C, --real-estate-type/-T
+```
+
+### En tant que librairie
+
+```python
+import pylbc
+
+'''
+and do your magic here...
+using pylbc.Search() and pylbc.SearchResult()
+'''
+```
+Jettez un oeil aux exemples plus bas ;-)
 
 ## Documentation
 
@@ -79,7 +108,7 @@ SearchResult(\
 )
 ```
 
-### Examples 
+## Exemples 
 
 
 ```python
