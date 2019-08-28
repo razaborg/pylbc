@@ -28,7 +28,9 @@ Et utilisez le directement ou installez-le avec setuptools :-)
 
 ### Directement en CLI
 
-```
+```sh
+curl https://raw.githubusercontent.com/razaborg/pylbc/master/lbcli.py -o lbcli.py
+chmod +x lbcli.py
 ./lbcli.py
 usage: lbcli.py [-h] [--coordinates LAT LNG] [--radius RADIUS] --category
                 {immobilier,ventes,locations,colocations} --real-estate-type
