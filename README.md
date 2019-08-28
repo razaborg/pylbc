@@ -69,12 +69,14 @@ Plusieurs fonctionnaliéts de recherche sont proposés par le site leboncoin.
 Parmi lesquelles :
 
 - définir une catégorie : la méthode **set\_category()**
+- définir des mots-clés de recherche : la méthode **set_query()**
 - définir un fourchette de prix : la méthode **set\_price()**
 - définir une fourchette de surface : la méthode **set\_square()**
 - définir une fourchette de pièces : la méthode **set\_rooms()**
 - définir un/des type de bien : la méthode **set\_real\_estate\_type()**
 - définir un/des départements géographiques : la méthode **set\_departments()**
 - définir une zone géographique et un rayon : la méthode **set_coordinates()**
+- définir une ville de recherche : la méthode **add_city()** (non compatible avec les autres options de recherche géographique)
 
 Une fois la recherche paramétrée, la requete peut être lancée avec :
 

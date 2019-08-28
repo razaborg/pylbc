@@ -10,7 +10,7 @@ import setuptools
 
 setuptools.setup(
     name="pylbc",
-    version="1.0",
+    version="1.0.2",
     author="razaborg",
     author_email="contact@razaborg.fr",
     description="An (unofficial) python3 wrapper API around leboncoin.",
