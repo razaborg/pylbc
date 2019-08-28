@@ -285,15 +285,41 @@ class SearchResult():
     This is a lighter version of the returned object, with only the needed elements \
     and some useful methods.
     '''
-    def __init__(self, title, category, publication_date, price, coordinates, real_estate_type, square, url, thumbnail):
+    def __init__(self, title="", category=None, publication_date=None, price=None, coordinates=None, real_estate_type=None, square=None, url=None, thumbnail=None):
+        if title is not None:
+            assert(type(title) == type(str()))
         self.title = title
+        
+        if publication_date is not None:
+            assert(isinstance(publication_date, datetime.date))
         self.publication_date = publication_date
+
+        if category is not None:
+            assert(check_cat_name(category))
         self.category = category
+        
+        if price is not None:
+            assert(type(price) == type(int()))
         self.price = price
+        
+        if coordinates is not None:
+            assert(type(coordinates) == type(tuple()))
         self.coordinates = coordinates
+        
+        if real_estate_type is not None:
+            assert(check_type_name(real_estate_type))
         self.real_estate_type = real_estate_type
+
+        if square is not None:
+            assert(type(square) == type(int()))
         self.square = square 
+
+        if url is not None:
+            assert(type(url) == type(str()))
         self.url = url
+
+        if thumbnail is not None:
+            assert(type(thumbnail) == type(str()))
         self.thumbnail = thumbnail
 
     @classmethod
@@ -333,8 +359,14 @@ class SearchResult():
             if key == 'real_estate_type':
                 real_estate_type = i['value_label'].lower()
             if key == 'square':
-                square = i['value'].lower()
-        
+                try:
+                    if '€' not in i['value']:
+                        square = int(i['value'])
+                    else:
+                        square = int(i['value'][:-1])
+                except ValueError:
+                    square = 0
+
         return cls(title, category, publication_date, price, coordinates, real_estate_type, square, url, thumbnail)
 
     def is_house(self): 
