@@ -304,6 +304,8 @@ class SearchResult():
         
         if coordinates is not None:
             assert(type(coordinates) == type(tuple()))
+        else:
+            coordinates = (None,None)
         self.coordinates = coordinates
         
         if real_estate_type is not None:
@@ -312,6 +314,7 @@ class SearchResult():
 
         if square is not None:
             assert(type(square) == type(int()))
+        
         self.square = square 
 
         if url is not None:
@@ -406,7 +409,11 @@ class SearchResult():
         CUSTOM METHOD
         Return the price per m2 of a result.
         '''
-        return self.price/self.square
+        try:
+            return self.price/self.square
+        except TypeError:
+            # cannot compute, because one of the 2 parameters might be empty
+            return None
 
     def __repr__(self):
         s = 'SearchResult(title="{}", category="{}", publication_date="{}", price={}, coordinates={}, real_estate_type="{}", square={}, url="{}", thumbnail="{}")'.format( \
