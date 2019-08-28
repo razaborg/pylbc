@@ -8,7 +8,7 @@ Requis : **python >= 3.0**
 
 ### Avec pip
 
-```python
+```sh
 python3 -m venv venv
 source venv/bin/activate
 python3 -m pip install pylbc 
@@ -16,7 +16,7 @@ python3 -m pip install pylbc
 
 ### Depuis les sources 
 
-```bash
+```sh
 git clone https://github.com/razaborg/pylbc.git
 cd pylbc
 ```
@@ -97,6 +97,7 @@ Actuellement ce type d'objet ne peut être généré qu'automatiquement à parti
 #### Les attributs
 
 Voici à quoi ressemble un objet de cette classe, avec l'ensemble de ses attributs:
+
 ```python
 SearchResult(\
  title="Charmante maison en pierre centre-ville", \
@@ -116,7 +117,6 @@ SearchResult(\
 ```python
 #!/usr/bin/env python3
 import pylbc
-
 
 lat_paris, lng_paris = 48.864716, 2.349014
 radius = 50 # in kilometers
