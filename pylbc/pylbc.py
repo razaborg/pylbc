@@ -2,11 +2,7 @@
 import requests
 import time
 import datetime
-import pprint
 import json
-from collections import namedtuple
-import time
-import datetime
 
 CATEGORIES = { 8: 'immobilier', 9: 'ventes', 10:'locations', 11: 'colocations'}
 get_cat_by_id = lambda x : next((name for id,name in CATEGORIES.items() if str(id) == str(x)), False)
@@ -217,8 +213,7 @@ class Search():
         Display the current value of the differents filters which have been set
         '''
         self.__prepare_payload()
-        pp = pprint.PrettyPrinter(indent=4, compact=False)
-        pprint.pprint(self.payload)
+        print(self.payload)
     
     def request_once(self, verify=True):
         '''
