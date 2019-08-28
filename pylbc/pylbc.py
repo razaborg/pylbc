@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import requests
 import time
-import requests
 import datetime
 import pprint
 import json
