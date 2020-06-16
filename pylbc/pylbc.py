@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
-import requests
 import time
 import datetime
 import json
+import requests
 
 CATEGORIES = { 8: 'immobilier', 9: 'ventes', 10:'locations', 11: 'colocations'}
 get_cat_by_id = lambda x : next((name for id,name in CATEGORIES.items() if str(id) == str(x)), False)
@@ -285,14 +284,16 @@ class SearchResult():
     This is a lighter version of the returned object, with only the needed elements \
     and some useful methods.
     '''
-    def __init__(self, title="", category=None, publication_date=None, price=None, coordinates=None, real_estate_type=None, square=None, url=None, thumbnail=None):
+    def __init__(self, title, category, publication_date, price, coordinates, real_estate_type, square, url, thumbnail, **kwargs):
         if title is not None:
             assert(type(title) == type(str()))
         self.title = title
         
         if publication_date is not None:
-            assert(isinstance(publication_date, datetime.date))
-        self.publication_date = publication_date
+            if not isinstance(publication_date, datetime.date):
+              self.publication_date = datetime.datetime.strptime(publication_date, '%Y-%m-%d')
+            else:
+              self.publication_date = publication_date
 
         if category is not None:
             assert(check_cat_name(category))
@@ -370,7 +371,7 @@ class SearchResult():
                 except ValueError:
                     square = 0
 
-        return cls(title, category, publication_date, price, coordinates, real_estate_type, square, url, thumbnail)
+        return cls(title=title, category=category, publication_date=publication_date, price=price, coordinates=coordinates, real_estate_type=real_estate_type, square=square, url=url, thumbnail=thumbnail)
 
     def is_house(self): 
         '''
@@ -403,7 +404,8 @@ class SearchResult():
             return True
         else:
             return False
-    
+
+    @property 
     def price_per_square(self):
         '''
         CUSTOM METHOD
@@ -416,10 +418,11 @@ class SearchResult():
             return None
 
     def __repr__(self):
-        s = 'SearchResult(title="{}", category="{}", publication_date="{}", price={}, coordinates={}, real_estate_type="{}", square={}, url="{}", thumbnail="{}")'.format( \
+        s = 'SearchResult(title="{}", category="{}", publication_date="{}", price_per_square={}, price={}, coordinates={}, real_estate_type="{}", square={}, url="{}", thumbnail="{}")'.format( \
                 self.title,
                 self.category,
                 self.publication_date,
+                self.price_per_square,
                 self.price,
                 self.coordinates,
                 self.real_estate_type,
@@ -429,5 +432,6 @@ class SearchResult():
                 )
         return s
 
-
+    def __eq__(self, other):
+        return self.__repr__() == other.__repr__()
 
